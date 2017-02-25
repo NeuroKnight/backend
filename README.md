@@ -9,9 +9,9 @@ All the API endpoints are accessible under `<hostname>/api`. All of the outputs 
 
 ```json
 {
-  'status': "<int>",
-  'message': "<string>",
-  'data': "<dict>"
+  "status": "<int>",
+  "message": "<string>",
+  "data": "<dict>"
 }
 ```
 The outputs of each API Route correspond to the modified attributes of this default output JSON.
