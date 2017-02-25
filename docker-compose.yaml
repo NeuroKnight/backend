@@ -1,0 +1,19 @@
+version: '2'
+services:
+
+  api:
+    container_name: "neuroknight_backend_api"
+    build: .
+    command: "flask run --host=0.0.0.0"
+    ports: 
+      - "5000:5000"
+    volumes:
+      - ".:/neuroknight"
+    links:
+      - db
+    env_file: api.env
+    
+  db:
+    image: postgres:9.6.1
+    container_name: "neuroknight_backend_db"
+    env_file: db.env
