@@ -16,17 +16,17 @@ All the API endpoints are accessible under `<hostname>/api`. All of the outputs 
 ```
 The outputs of each API Route correspond to the modified attributes of this default output JSON.
   
-1. `/api/user/signup` - Sign a user up
+1. `/api/signup` - Sign a user up
   * **POST/GET**
   * Input: {username, password, full_name}
   * Returns: {status, message}
   
-2. `/api/user/login` - Log a user into the system
+2. `/api/login` - Log a user into the system
   * **POST/GET**
   * Input: {username, password}
   * Returns: {status, message, data:{token}}
   
-3. `/api/measurement` - Collect instrument values from the various sensors
+3. `/api/user/measurement` - Collect instrument values from the various sensors
   * **POST/GET**
   * Input: {token, value, instrument, record_time?}
   * Returns: {status, message}
