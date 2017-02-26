@@ -44,7 +44,7 @@ class Base(Model):
 
 
 class User(Base):
-  user_name = TextField(unique=True, index=True)
+  username = TextField(unique=True, index=True)
   password = CharField()
   full_name = TextField()
   join_time = DateTimeField(default=datetime.datetime.now)
@@ -55,6 +55,9 @@ class Measurement(Base):
   value = DoubleField()
   record_time = DateTimeField(default=datetime.datetime.now, index=True)
   instrument = TextField(default="unlabeled")
+
+  class Meta:
+    primary_key = CompositeKey('user', 'instrument', 'record_time')
 
 
 class UserSymptoms(Base):
@@ -67,3 +70,6 @@ class UserRelatives(Base):
   user = ForeignKeyField(User, index=True)
   full_name = TextField()
   phone = IntegerField()
+
+  class Meta:
+    primary_key = CompositeKey('user', 'phone')
