@@ -115,10 +115,17 @@ def route_user_measurements():
   return response_execution(run)
 
 
+@app.route("/api/user/get_relatives", methods=["POST", "GET"])
+def route_user_relatives():
+  def run():
+    data = request_payload()
+    return user_controller.get_relatives(data)
+  return response_execution(run)
+
 print "Connecting to Server"
 database.setup()
 print "Database Connection Success"
 
 
 if __name__ == "__main__":
-  app.run()
+  app.run(threaded=True)

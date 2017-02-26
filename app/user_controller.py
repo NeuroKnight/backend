@@ -111,26 +111,31 @@ def measurement(payload):
 
   try:
     new_measurement = database.Measurement()
-    new_measurement.user = payload["token"]
-    new_measurement.value = payload["value"]
-    new_measurement.instrument = payload["instrument"]
+    new_measurement.user = int(payload.get("token"))
+    new_measurement.value = float(payload.get("value"))
+    new_measurement.instrument = payload.get("instrument")
 
     if payload.get("record_time") is not None:
-      new_measurement.record_time = payload["record_time"]
+      new_measurement.record_time = payload.get("record_time")
 
-    new_measurement.save()
+    if new_measurement.save(force_insert=True) == 1:
+      return {
+        'status': 200,
+        'data': {},
+        'message': 'success'
+      }
+    return {
+      'status': 400,
+      'data': {},
+      'message': 'Did not save data'
+    }
+
   except database.User.DoesNotExist:
     return {
       'status': 400,
       'data': {},
       'message': "Invalid token: User does not exist"
     }
-
-  return {
-    'status': 200,
-    'data': {},
-    'message': 'success'
-  }
 
 
 def add_relative(payload):
@@ -158,22 +163,27 @@ def add_relative(payload):
 
   try:
     new_relative = database.UserRelatives()
-    new_relative.user = payload["token"]
-    new_relative.full_name = payload["full_name"]
-    new_relative.phone = payload["phone"]
-    new_relative.save()
+    new_relative.user = int(payload.get("token"))
+    setattr(new_relative, "full_name", payload.get("full_name"))
+    new_relative.phone = int(payload.get("phone"))
+    if new_relative.save(force_insert=True) == 1:
+      return {
+        'status': 200,
+        'data': {},
+        'message': 'success'
+      }
+    return {
+      'status': 400,
+      'data': {},
+      'message': 'Did not save data'
+    }
+
   except database.User.DoesNotExist:
     return {
       'status': 400,
       'data': {},
       'message': 'Invalid Token: User does not exist'
     }
-
-  return {
-    'status': 200,
-    'data': {},
-    'message': 'success'
-  }
 
 
 def get_measurements(payload):
@@ -191,15 +201,20 @@ def get_measurements(payload):
   if not schema.validate(payload):
     return {
       'status': 400,
-      'data': {},
-      'message': 'Token required'
+      'data': schema.errors,
+      'message': 'Invalid input'
     }
 
   try:
-    measurements = database.Measurement.select().where(
-      database.Measurement.instrument == payload.get("instrument"),
-      database.Measurement.user == payload.get("token")
-    )
+    if payload.get("instrument"):
+      measurements = database.Measurement.select().where(
+        database.Measurement.instrument == payload.get("instrument"),
+        database.Measurement.user == payload.get("token")
+      )
+    else:
+      measurements = database.Measurement.select().where(
+        database.Measurement.user == payload.get("token")
+      )
   except database.User.DoesNotExist:
     return {
       'status': 400,
@@ -213,6 +228,45 @@ def get_measurements(payload):
                 measurement_obj.record_time - datetime(1970, 1, 1)
               ).total_seconds()}
              for measurement_obj in measurements]
+
+  return {
+    'status': 200,
+    'data': {
+      'results': results
+    },
+    'message': 'success'
+  }
+
+
+def get_relatives(payload):
+  schema = Validator({
+    'token': {
+      'type': 'string',
+      'required': True
+    }
+  })
+
+  if not schema.validate(payload):
+    return {
+      'status': 400,
+      'data': schema.errors,
+      'message': 'Invalid input'
+    }
+
+  try:
+    relatives = database.UserRelatives.select().where(
+      database.UserRelatives.user == payload.get("token")
+    )
+  except database.User.DoesNotExist:
+    return {
+      'status': 400,
+      'data': {},
+      'message': 'Invalid Token - User does not exist'
+    }
+
+  results = [{'full_name': relative.full_name,
+              'phone': relative.phone}
+             for relative in relatives]
 
   return {
     'status': 200,
