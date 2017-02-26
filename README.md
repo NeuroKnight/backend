@@ -39,9 +39,9 @@ The outputs of each API Route correspond to the modified attributes of this defa
 5. `/api/user/get_measurements` - Get all of the measurements for the user
     * **POST/GET**
     * Input: {token, instrument?}
-    * Returns: {instrument, value, record_time}
+    * Returns: {status, data:{results: [{instrument, value, record_time}], message}}
 
 5. `/api/user/get_relatives` - Get all of the relatives for the user
     * **POST/GET**
     * Input: {token}
-    * Returns: {full_name, phone}
+    * Returns: [status, data:{results: [{full_name, phone}]}, message]
