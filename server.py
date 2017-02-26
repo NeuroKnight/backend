@@ -40,11 +40,12 @@ def response_execution(body_func, silence_errors=True):
       result = body_func()
     except BaseException as e:
       response = jsonify({
-        'status': 400,
+        'status': 405,
         'message': e.message,
         'data': {}
       })
-      response.status_code = 400
+      response.status_code = 405
+      print e.message
       return response
 
     response = jsonify(result)

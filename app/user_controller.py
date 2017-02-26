@@ -2,6 +2,14 @@ from cerberus import Validator
 import database
 from datetime import datetime
 from playhouse.shortcuts import model_to_dict
+from twilio.rest import TwilioRestClient
+from os import environ
+
+
+twilio_client = TwilioRestClient(
+  environ.get("TWILIO_API_ID"),
+  environ.get("TWILIO_API_KEY")
+)
 
 
 def signup(payload):
@@ -104,7 +112,7 @@ def measurement(payload):
 
   if not schema.validate(payload):
     return {
-      'status': 400,
+      'status': 410,
       'data': schema.errors,
       'message': 'Payload incorrect/missing values'
     }
@@ -125,14 +133,14 @@ def measurement(payload):
         'message': 'success'
       }
     return {
-      'status': 400,
+      'status': 402,
       'data': {},
       'message': 'Did not save data'
     }
 
   except database.User.DoesNotExist:
     return {
-      'status': 400,
+      'status': 401,
       'data': {},
       'message': "Invalid token: User does not exist"
     }
@@ -166,6 +174,14 @@ def add_relative(payload):
     new_relative.user = int(payload.get("token"))
     setattr(new_relative, "full_name", payload.get("full_name"))
     new_relative.phone = int(payload.get("phone"))
+
+    twilio_client.messages.create(
+      to=("+" + payload.get("phone")),
+      from_="+3059514410",
+      body="You were added to %s contacts for NightWatch"
+           % new_relative.user.full_name
+    )
+
     if new_relative.save(force_insert=True) == 1:
       return {
         'status': 200,

@@ -2,6 +2,7 @@ appdirs==1.4.2
 Cerberus==1.1
 click==6.7
 Flask==0.12
+httplib2==0.10.3
 itsdangerous==0.24
 Jinja2==2.9.5
 MarkupSafe==0.23
@@ -9,5 +10,7 @@ packaging==16.8
 peewee==2.8.7
 psycopg2==2.6.2
 pyparsing==2.1.10
+pytz==2016.10
 six==1.10.0
+twilio==5.7.0
 Werkzeug==0.11.15
